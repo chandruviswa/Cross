@@ -1,0 +1,227 @@
+ADDCATEGORY:
+
+  private void button1_Click(object sender, EventArgs e)
+        {
+            string a = "";
+            if (radioButton1.Checked == true)
+            {
+                a = "1";
+                radioButton2.Checked = false;
+            }
+            else if (radioButton2.Checked == true)
+            {
+                a = "0";
+                radioButton1.Checked = false;
+            }
+
+            connection.Close();
+            connection.Open();
+            dataGridView1.Rows.Clear();
+            if (textBox1.Text != null && textBox1.Text != "")
+            {
+                cmd = new MySqlCommand("insert into item_cat(item_cat,separate_bill)values('" + textBox1.Text + "','" + a + "')", connection);
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Item Successfully Add");
+                textBox1.Clear();
+                pageload();
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string a = "";
+            if (radioButton1.Checked == true)
+            {
+                a = "1";
+                radioButton2.Checked = false;
+            }
+            else if (radioButton2.Checked == true)
+            {
+                a = "0";
+                radioButton1.Checked = false;
+            }
+            connection.Close();
+            connection.Open();
+            dataGridView1.Rows.Clear();
+            cmd = new MySqlCommand("update item_cat set item_cat='" + textBox1.Text + "',separate_bill='" + a + "' where itm_id='" + label2.Text + "'", connection);
+            cmd.ExecuteNonQuery();
+            textBox1.Clear();
+            button1.Visible = true;
+            button2.Visible = false;
+            pageload();
+        }
+
+ADDMENU:
+  private void button2_Click(object sender, EventArgs e)
+        {
+            connection.Close();
+            connection.Open();
+            dataGridView1.Rows.Clear();
+            int x = 0;
+            if (textBox1.Text != null && textBox1.Text != "")
+            {
+                cmd = new MySqlCommand("select itm_code from item_master where itm_code='" + textBox1.Text + "'", connection);
+                dread = cmd.ExecuteReader();
+                //string item = "";
+                if (dread.HasRows)
+                {
+                    while (dread.Read())
+                    {
+                        //item = dread.GetValue(0).ToString();
+                        x = 1;
+                    }
+                }
+                dread.Close();
+            }
+            if (x == 1)
+            {
+                DialogResult result = MessageBox.Show("Are sure want to replace ?", "Confirmation", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                {
+                    cmd = new MySqlCommand("replace into item_master(itm_code,item,unit_price,itm_cat,bar_code,stock,parcel,party,commision,par_com,unit)values('" + textBox1.Text + "','" + textBox2.Text + "','" + textBox11.Text + "','" + textBox8.Text + "','" + textBox9.Text + "','" + textBox10.Text + "','" + textBox3.Text + "','" + textBox4.Text + "','" + textBox5.Text + "','" + textBox6.Text + "','" + textBox7.Text + "')", connection);
+                    cmd.ExecuteNonQuery();
+                    pageload();
+                }
+                clear();
+            }
+            else
+            {
+                if (textBox1.Text != null && textBox1.Text != "" && comboBox1.Text !="" && comboBox1.Text !=null)
+                {
+                    cmd = new MySqlCommand("insert into item_master(itm_code,item,unit_price,itm_cat,bar_code,stock,parcel,party,commision,par_com,unit,tax_cat,vat,cat)values('" + textBox1.Text + "','" + textBox2.Text + "','" + textBox11.Text + "','" + textBox8.Text + "','" + textBox9.Text + "','" + textBox10.Text + "','" + textBox3.Text + "','" + textBox4.Text + "','" + textBox5.Text + "','" + textBox6.Text + "','" + textBox7.Text + "','"+textBox13.Text+"','"+textBox12.Text+"','"+comboBox1.Text+"')", connection);
+                    cmd.ExecuteNonQuery();
+                    pageload();
+                    clear();
+                }
+                else
+                {
+                    cmd = new MySqlCommand("insert into item_master(item,unit_price,itm_cat,bar_code,stock,parcel,party,commision,par_com,unit,tax_cat,vat,cat)values('" + textBox2.Text + "','" + textBox11.Text + "','" + textBox8.Text + "','" + textBox9.Text + "','" + textBox10.Text + "','" + textBox3.Text + "','" + textBox4.Text + "','" + textBox5.Text + "','" + textBox6.Text + "','" + textBox7.Text + "','" + textBox13.Text + "','" + textBox12.Text + "','" + comboBox1.Text + "')", connection);
+                    cmd.ExecuteNonQuery();
+                    cmd = new MySqlCommand("insert into unitwise_price_line (icode,unit,price)values('" + textBox14.Text + "','" + textBox15.Text + "','" + textBox11 .Text + "')", connection);
+                    cmd.ExecuteNonQuery();
+                    pageload();
+                    clear();
+                }
+            }
+            MessageBox.Show("Successfully inserted","Success",MessageBoxButtons.OK,MessageBoxIcon.Information);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            int i = 0;
+            connection.Close();
+            connection.Open();
+            int count = 0;
+            cmd = new MySqlCommand("select count(*) from prod_unit", connection);
+            dread = cmd.ExecuteReader();
+            while (dread.Read())
+            {
+                if (dread.GetValue(0).ToString() != null && dread.GetValue(0).ToString() != "")
+                {
+                    count = Convert.ToInt32(dread.GetValue(0).ToString());
+                }
+            }
+            dread.Close();
+            string[] uid = new string[count];
+            cmd = new MySqlCommand("select uid from prod_unit", connection);
+            dread = cmd.ExecuteReader();
+            int x=0;
+            while (dread.Read())
+            {
+                uid[x]=dread.GetValue(0).ToString();
+                x++;
+            }
+            dread.Close();
+
+            for (i = 0; i < dataGridView1.Rows.Count; i++)
+            {
+                if (dataGridView1.Rows[i].Cells[0].Value.ToString() != null && dataGridView1.Rows[i].Cells[0].Value.ToString() != "")
+                {
+                    string itm_code = "", item = "", unit_price = "", parcel = "", party = "", commision = "", par_com = "", bar_code = "", itm_cat = "", unit = "";
+                    if (dataGridView1.Rows[i].Cells[0].Value != null && dataGridView1.Rows[i].Cells[0].Value != "")
+                    {
+                        itm_code = dataGridView1.Rows[i].Cells[0].Value.ToString();
+                    }
+                    if (dataGridView1.Rows[i].Cells[1].Value != null && dataGridView1.Rows[i].Cells[1].Value != "")
+                    {
+                        item = dataGridView1.Rows[i].Cells[1].Value.ToString();
+                    }
+                    if (dataGridView1.Rows[i].Cells[2].Value != null && dataGridView1.Rows[i].Cells[2].Value != "")
+                    {
+                        unit_price = dataGridView1.Rows[i].Cells[2].Value.ToString();
+                    }
+                    if (dataGridView1.Rows[i].Cells[3].Value != null && dataGridView1.Rows[i].Cells[3].Value != "")
+                    {
+                        parcel = dataGridView1.Rows[i].Cells[3].Value.ToString();
+                    }
+                    if (dataGridView1.Rows[i].Cells[4].Value != null && dataGridView1.Rows[i].Cells[4].Value != "")
+                    {
+                        party = dataGridView1.Rows[i].Cells[4].Value.ToString();
+                    }
+                    if (dataGridView1.Rows[i].Cells[5].Value != null && dataGridView1.Rows[i].Cells[5].Value != "")
+                    {
+                        commision = dataGridView1.Rows[i].Cells[5].Value.ToString();
+                    }
+                    if (dataGridView1.Rows[i].Cells[6].Value != null && dataGridView1.Rows[i].Cells[6].Value != "")
+                    {
+                        par_com = dataGridView1.Rows[i].Cells[6].Value.ToString();
+                    }
+                    if (dataGridView1.Rows[i].Cells[7].Value != null && dataGridView1.Rows[i].Cells[7].Value != "")
+                    {
+                        bar_code = dataGridView1.Rows[i].Cells[7].Value.ToString();
+                    }
+                    if (dataGridView1.Rows[i].Cells[9].Value != null && dataGridView1.Rows[i].Cells[9].Value != "")
+                    {
+                        itm_cat = dataGridView1.Rows[i].Cells[9].Value.ToString();
+                    }
+                    if (dataGridView1.Rows[i].Cells[10].Value != null && dataGridView1.Rows[i].Cells[10].Value != "")
+                    {
+                        unit = dataGridView1.Rows[i].Cells[10].Value.ToString();
+                    }
+                    if (itm_cat != null && itm_cat != "")
+                    {
+                        cmd = new MySqlCommand("update item_master set item='" + item + "',unit_price='" + unit_price + "',parcel='" + parcel + "',party='" + party + "',commision='" + commision + "',par_com='" + par_com + "',bar_code='" + bar_code + "',itm_cat='" + itm_cat + "',unit='" + unit + "' where itm_code='" + itm_code + "'", connection);
+                        cmd.ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        cmd = new MySqlCommand("update item_master set item='" + item + "',unit_price='" + unit_price + "',parcel='" + parcel + "',party='" + party + "',commision='" + commision + "',par_com='" + par_com + "',bar_code='" + bar_code + "',unit='" + unit + "' where itm_code='" + itm_code + "'", connection);
+                        cmd.ExecuteNonQuery();
+                    }
+                    int j = 0;
+                    for (j = 0; j < count; j++)
+                    {
+                        int check = 0;
+                        cmd = new MySqlCommand("select * from unitwise_price_line where icode='" + dataGridView1.Rows[i].Cells[0].Value + "' and unit='" + uid[j] + "'", connection);
+                        dread=cmd.ExecuteReader();
+                        while (dread.Read())
+                        {
+                            check = 1;
+                        }
+                        dread.Close();
+                        double price = 0.00;
+                        if (dataGridView1.Rows[i].Cells[j + 10].Value != null && dataGridView1.Rows[i].Cells[j + 10].Value != "")
+                        {
+                            price = Convert.ToDouble(dataGridView1.Rows[i].Cells[j + 10].Value);
+                        }
+                        if (check == 1)
+                        {
+                            cmd = new MySqlCommand("update unitwise_price_line set price='" + price + "' where icode='" + dataGridView1.Rows[i].Cells[0].Value + "' and unit='" + uid[j] + "'", connection);
+                            cmd.ExecuteNonQuery();
+                        }
+                        else
+                        {
+                            cmd = new MySqlCommand("insert into unitwise_price_line (icode,unit,price) values ('" + dataGridView1.Rows[i].Cells[0].Value + "','" + uid[j] + "','" + price + "')", connection);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+            }
+            connection.Close();
+            MessageBox.Show("Successfully updated.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            this.Close();
+            Form61 form61 = new Form61();
+            form61.StartPosition = FormStartPosition.CenterScreen;
+            form61.ShowDialog();
+        }
+

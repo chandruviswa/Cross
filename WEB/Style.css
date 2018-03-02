@@ -1,0 +1,15 @@
+@charset "utf-8";
+/* CSS Document */
+@media screen 
+{
+    .btn btn-info
+    {
+        background-color: #AFAFAF;
+        display: block;
+    }
+    .tble
+    {
+        background-color: #E5E5E5;
+        border: 1px solid #CD853F;
+    }
+}
